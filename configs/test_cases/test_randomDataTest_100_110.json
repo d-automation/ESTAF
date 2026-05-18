@@ -1,0 +1,32 @@
+{
+  "meta": {
+    "name": "randomDataTest_100_110",
+    "description": "start random data test in all target of NAND Flash",
+    "parameters": {
+      "cmd_code": 19,
+      "mode_random": 2,
+      "seed":1,
+      "begin_block": 100,
+      "end_block": 110
+    }
+  },
+
+  "binary": "C:/Danila/work/embedded_test_stand/cmd/randomDataTest_blocks_100_110_seed_1.bin",
+
+  "expectations": {
+    "start": {
+      "type": "json",
+      "fields": {
+        "msgType": 2,
+        "cmd": 19
+      }
+    },
+
+    "end": {
+      "type": "contains",
+      "value": "NAND Flash test stand ready to receive new commands"
+    }
+  },
+
+  "timeout_msec": 5000
+}

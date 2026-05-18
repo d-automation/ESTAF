@@ -1,0 +1,29 @@
+{
+  "meta": {
+    "name": "get_savedBadBlockMap_fromNAND",
+    "description": "get bad block map from NAND Flash into RAM",
+    "parameters": {
+      "cmd_code": 4,
+      "badBlockMapOperMode": 2
+    }
+  },
+
+  "binary": "C:/Danila/work/embedded_test_stand/cmd/get_savedBadBlockMap_fromNAND.bin",
+
+  "expectations": {
+    "start": {
+      "type": "json",
+      "fields": {
+        "msgType": 2,
+        "cmd": 4
+      }
+    },
+
+    "end": {
+      "type": "contains",
+      "value": "NAND Flash test stand ready to receive new commands"
+    }
+  },
+
+  "timeout_msec": 200
+}

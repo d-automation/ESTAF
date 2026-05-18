@@ -1,0 +1,37 @@
+{
+  "meta": {
+    "name": "set_micron_MT29F16G08AJADAWP",
+    "description": "check settings for micron_MT29F16G08AJADAWP",
+    "parameters": {
+      "cmd_code": 5,
+      "endurance": 100000,
+      "timerPeriod": 100,
+      "timeoutProgPageDMA": 600,
+      "timeoutReadPageDMA":600,
+      "extMemTurnCycles": 1,
+      "extMemeWriteCycles": 1,
+      "extMemReadCycles": 1,
+      "DMAincr": 0,
+      "repeatOper": 1
+    }
+  },
+
+  "binary": "C:/Danila/work/embedded_test_stand/cmd/set_settings_NAND_micron_MT29F16G08AJADAWP.bin",
+
+  "expectations": {
+    "start": {
+      "type": "json",
+      "fields": {
+        "msgType": 2,
+        "cmd": 5
+      }
+    },
+
+    "end": {
+      "type": "contains",
+      "value": "NAND Flash test stand ready to receive new commands"
+    }
+  },
+
+  "timeout_msec": 200
+}

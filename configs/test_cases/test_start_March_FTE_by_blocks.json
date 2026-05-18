@@ -1,0 +1,54 @@
+{
+  "meta": {
+    "name": "start_March-FTE_by_blocks",
+    "description": "start March-FTE by specified blocks",
+    "parameters": {
+      "cmd_code": 21,
+      "mode_March_FTE": 2,
+      "begin_block": 20,
+      "end_block": 25
+    }
+  },
+
+  "binary": "C:/Danila/work/embedded_test_stand/cmd/start_March-FTE_by_blocks_20_25.bin",
+
+  "expectations": {
+    "start": {
+      "type": "json",
+      "fields": {
+        "msgType": 2,
+        "cmd": 21
+      }
+    },
+
+    "sequence": [
+      {
+        "type": "regex",
+        "value": "start march-FTE in block \\d+(, LUN 0, Target 0)?"
+      },
+      {
+        "type": "regex",
+        "value": "start march-FTE in block \\d+(, LUN 0, Target 0)?"
+      },
+      {
+        "type": "regex",
+        "value": "start march-FTE in block \\d+(, LUN 0, Target 0)?"
+      },
+      {
+        "type": "regex",
+        "value": "start march-FTE in block \\d+(, LUN 0, Target 0)?"
+      },
+      {
+        "type": "regex",
+        "value": "start march-FTE in block \\d+(, LUN 0, Target 0)?"
+      }
+    ],
+
+    "end": {
+      "type": "contains",
+      "value": "NAND Flash test stand ready to receive new commands"
+    }
+  },
+
+  "timeout_msec": 27000
+}

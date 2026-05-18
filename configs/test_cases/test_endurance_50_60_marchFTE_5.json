@@ -1,0 +1,34 @@
+{
+  "meta": {
+    "name": "endurance_50_60_marchFTE_5",
+    "description": "start endurance test in NAND Flash",
+    "parameters": {
+      "cmd_code": 22,
+      "block_check_cnt": 2,
+      "blocks": [50, 60]
+    }
+  },
+
+  "binary": "C:/Danila/work/embedded_test_stand/cmd/endurance_50_60_marchFTE_5.bin",
+
+  "expectations": {
+    "start": {
+      "type": "json",
+      "fields": {
+        "msgType": 2,
+        "cmd": 22
+      }
+    },
+
+    "sequence": [
+      {
+        "type": "contains",
+        "value": "Current state of cycle counters:"
+      }
+    ],
+
+    "end": null
+  },
+
+  "timeout_msec": 9000
+}
