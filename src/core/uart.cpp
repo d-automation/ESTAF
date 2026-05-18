@@ -43,11 +43,22 @@ bool UART::send(const QByteArray& data, QString &err)
 
 QByteArray UART::receive(int timeoutMs)
 {
+    // overall timeout for all received chunks from UART
     QByteArray result;
+    QElapsedTimer timer;
+    timer.start();
 
-    while (serial.waitForReadyRead(timeoutMs))
+    while(timer.elapsed() < timeoutMs)
     {
-        result += serial.readAll();
+        int remain = timeoutMs - timer.elapsed();
+
+        if (remain <= 0) break;
+
+        if (serial.waitForReadyRead(remain))
+        {
+            result += serial.readAll();
+        }
+        else { break; }
     }
 
     return result;

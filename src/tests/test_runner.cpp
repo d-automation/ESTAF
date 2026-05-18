@@ -3,10 +3,25 @@
 
 extern TestOptions g_options;
 
-std::vector<QString> getJsonTests()
+QString prepareTestName(QString name)
+{
+    // replace invalid symbols into "_"
+    name.replace(QRegularExpression("[^a-zA-Z0-9_]"), "_");
+
+    // prepend T is digit first
+    if (!name.isEmpty() && name[0].isDigit()) { name.prepend("T_"); }
+
+    // protection from empty name:
+    if (name.isEmpty()) { name = "unnamed"; }
+
+    return name;
+}
+
+std::vector<TestCaseParam> getJsonTests()
 {
     QStringList list;
-    std::vector<QString> result;
+    std::vector<TestCaseParam> result;
+    QMap<QString, int> counters;
 
     try
     {
@@ -26,10 +41,25 @@ std::vector<QString> getJsonTests()
         return result;
     }
 
-
-    for (const auto& s : list)
+    for (const QString &path : list)
     {
-        result.push_back(s);
+        QFile f(path);
+
+        QString testName = "unknown";
+
+        if (f.open(QIODevice::ReadOnly))
+        {
+            QJsonObject obj = QJsonDocument::fromJson(f.readAll()).object();
+            testName = obj["meta"].toObject()["name"].toString();
+        }
+
+        int index = counters[testName]++;
+
+        TestCaseParam p;
+        p.path = path;
+        p.name = prepareTestName(QString("%1_%2").arg(testName).arg(index));
+
+        result.push_back(p);
     }
 
     return result;
@@ -39,15 +69,10 @@ std::vector<QString> getJsonTests()
 INSTANTIATE_TEST_SUITE_P(
     JsonTestSuite,
     UARTFixture,
-    ::testing::ValuesIn(
-        getJsonTests()
-    ),
-    [](const testing::TestParamInfo<QString>& info)
+    ::testing::ValuesIn(getJsonTests()),
+    [](const testing::TestParamInfo<TestCaseParam>& info)
     {
-        QFileInfo fi(info.param);
-
-        return fi.baseName()
-            .toStdString();
+        return info.param.name.toStdString();
     }
 );
 

@@ -7,11 +7,25 @@
 #include "../core/test_stats.h"
 #include <json_processor.h>
 
+struct TestCaseParam
+{
+    QString path;
+    QString name;
+};
+
+struct Stats_t
+{
+    uint16_t total;
+    uint16_t passed;
+    uint16_t failed;
+};
+
 class UARTFixture :
-    public ::testing::TestWithParam<QString>
+    public ::testing::TestWithParam<TestCaseParam>
 {
 protected:
     static UART uart;
+    static Stats_t stats;
     static comSettings_t comPortSettings;
     static path_t path;
     static QString logFile;

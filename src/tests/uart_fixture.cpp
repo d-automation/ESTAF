@@ -2,6 +2,7 @@
 
 UART UARTFixture::uart;
 comSettings_t UARTFixture::comPortSettings;
+Stats_t UARTFixture::stats;
 path_t UARTFixture::path;
 QString UARTFixture::logFile;
 
@@ -12,12 +13,9 @@ int UARTFixture::extract_struct_from_elf(QString structTypeName)
 
     QStringList arguments;
     arguments << path.elf_parser
-              << "-f"
-              << path.MK_elf_file
-              << "-t"
-              << structTypeName
-              << "-o"
-              << path.iar_json_out;
+              << "-f" << path.MK_elf_file
+              << "-t" << structTypeName
+              << "-o" << path.iar_json_out;
 
     process.start(program, arguments);
 
@@ -52,12 +50,9 @@ int UARTFixture::convert_map_file()
 
     QStringList arguments;
     arguments << path.map_parser
-              << "-f"
-              << path.MK_map_file
-              << "-s"
-              << "ENTRY LIST"
-              << "-o"
-              << path.iar_json_out;
+              << "-f" << path.MK_map_file
+              << "-s" << "ENTRY LIST"
+              << "-o" << path.iar_json_out;
 
     process.start(program, arguments);
 
@@ -153,6 +148,7 @@ int UARTFixture::readConfig()
 void UARTFixture::SetUpTestSuite()
 {
     Logger::setupLog();
+    memset(&stats, 0, sizeof(stats));
 
     int fail = UARTFixture::readConfig();
     if (fail == true) { return; }
@@ -184,6 +180,7 @@ void UARTFixture::TearDownTestSuite()
 
     QString curTime1 = QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss");
     QString htmlFile = path.stand_report_html_path;
+    Logger::appendSummary(logFile, stats.total, stats.passed, stats.failed);
     HtmlReport::generate(logFile, htmlFile, curTime1);
 }
 
@@ -195,7 +192,8 @@ extern TestOptions g_options;
 
 TEST_P(UARTFixture, JsonCase)
 {
-    QString caseFile = GetParam();
+    TestCaseParam param = GetParam();
+    QString caseFile = param.path;
     runCase(caseFile);
 }
 
@@ -206,7 +204,6 @@ void UARTFixture::runCase(
     QString msg;
     QString err;
     QString error;
-
 
     QFile caseFileJson(caseFile);
 //    ASSERT_TRUE(caseFileJson.open(QIODevice::ReadOnly));
@@ -260,6 +257,9 @@ void UARTFixture::runCase(
 
     Logger::saveTestLog(logFile, handler, cfg, passed, error);
 
+    stats.total++;
+    if (passed) stats.passed++;
+    else stats.failed++;
     EXPECT_TRUE(passed);
 
     if (g_options.delayMs > 0)

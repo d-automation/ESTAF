@@ -14,8 +14,8 @@
       "test_randomDataTest_100_110.json",
       "test_endurance_50_60_marchFTE_5.json",
       "test_abort.json",
-      "#test_start_March_FTE_all_targ0_repeat2.json",
-      "#test_abort.json"
+      "test_start_March_FTE_all_targ0_repeat2.json",
+      "test_abort.json"
     ],
 
     "abort": [
