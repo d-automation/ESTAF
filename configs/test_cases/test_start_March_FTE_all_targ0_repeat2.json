@@ -2,6 +2,7 @@
   "meta": {
     "name": "start_March-FTE_all_targ0_repeat2",
     "description": "start March-FTE for all target",
+    "input_data_type": "text",
     "parameters": {
       "cmd_code": 20,
       "target": 0,

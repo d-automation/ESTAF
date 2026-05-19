@@ -2,6 +2,7 @@
   "meta": {
     "name": "randomDataTest_100_110",
     "description": "start random data test in all target of NAND Flash",
+    "input_data_type": "text",
     "parameters": {
       "cmd_code": 19,
       "mode_random": 2,

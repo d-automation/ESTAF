@@ -2,6 +2,7 @@
   "meta": {
     "name": "start_March-FTE_by_blocks",
     "description": "start March-FTE by specified blocks",
+    "input_data_type": "text",
     "parameters": {
       "cmd_code": 21,
       "mode_March_FTE": 2,

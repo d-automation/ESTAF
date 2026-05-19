@@ -2,6 +2,7 @@
   "meta": {
     "name": "endurance_50_60_marchFTE_5",
     "description": "start endurance test in NAND Flash",
+    "input_data_type": "text",
     "parameters": {
       "cmd_code": 22,
       "block_check_cnt": 2,

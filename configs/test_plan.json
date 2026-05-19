@@ -20,6 +20,11 @@
 
     "abort": [
       "test_abort.json"
+    ],
+
+    "one": [
+      "test_UART_cmdSetDataInterface.json",
+      "test_readSnapshot_HK.json"
     ]
   }
 }

@@ -4,6 +4,8 @@ UART UARTFixture::uart;
 comSettings_t UARTFixture::comPortSettings;
 Stats_t UARTFixture::stats;
 path_t UARTFixture::path;
+UART_cmdReadMemory_t UARTFixture::iData;
+char UARTFixture::cmdDataBuf[UART_DATA_MAX_BYTES];
 QString UARTFixture::logFile;
 
 int UARTFixture::extract_struct_from_elf(QString structTypeName)
@@ -197,6 +199,22 @@ TEST_P(UARTFixture, JsonCase)
     runCase(caseFile);
 }
 
+void UARTFixture::writeToLog(QString errMsg, bool passed)
+{
+    if (!passed)
+    {
+        stats.failed++;
+        qDebug(logCritical()) << errMsg << Qt::endl;
+        Logger::writeToConsol(QString("\nERROR: %1\n").arg(errMsg));
+    }
+    else {
+        stats.passed++;
+    }
+
+    EXPECT_TRUE(passed);
+    stats.total++;
+}
+
 void UARTFixture::runCase(
     const QString& caseFile)
 {
@@ -204,58 +222,162 @@ void UARTFixture::runCase(
     QString msg;
     QString err;
     QString error;
+    bool passed = false;
+    QString protocolMsg;
+    QString test_case_path = "";
 
     QFile caseFileJson(caseFile);
-//    ASSERT_TRUE(caseFileJson.open(QIODevice::ReadOnly));
+
     if (!caseFileJson.open(QIODevice::ReadOnly))
-
-    {
-        msg = QString("%1, path: %2").arg("json test case not found", caseFile);
-        msgItog.append(msg);
-
-        qDebug(logCritical()) << msg << Qt::endl;
-        Logger::writeToConsol(QString("\nERROR: %1\n").arg(msg));
-    }
+    { writeToLog(QString("%1, path: %2").arg("json test case not found", caseFile), false); }
 
     QJsonObject cfg =
         QJsonDocument::fromJson(caseFileJson.readAll()).object();
 
-    QString binaryFile = cfg["binary"].toString();
+    QJsonObject meta = cfg["meta"].toObject();
 
-    QFile cmdFile(binaryFile);
-//    ASSERT_TRUE(cmdFile.open(QIODevice::ReadOnly));
-    if (!cmdFile.open(QIODevice::ReadOnly))
+    if (meta.isEmpty())
     {
-        msg = QString("%1, path: %2").arg("command binary not found", binaryFile);
+        msg = QString("%1, path: %2").arg("incorrect json file: ", caseFile);
         msgItog.append(msg);
 
         qDebug(logCritical()) << msg << Qt::endl;
         Logger::writeToConsol(QString("\nERROR: %1\n").arg(msg));
     }
 
-    QByteArray tx_cmd = cmdFile.readAll();
-    if (!uart.send(tx_cmd, err))
+
+    if (meta["input_data_type"].toString() == "binary")
     {
-        msg = QString("%1: %2").arg("UART data did not send", err);
-        msgItog.append(msg);
+        QJsonObject param = meta["parameters"].toObject();
 
-        qDebug(logCritical()) << msg << Qt::endl;
-        Logger::writeToConsol(QString("\nERROR: %1\n").arg(msg));
+        bool ok = false;
+        iData.version = param["version"].toInt();
+
+        if (param["addr_user_set"].toBool() == true)
+        { iData.addr_begin = param["addr"].toString().toUInt(&ok, 16); }
+
+        if (param["size_user_set"].toBool() == true)
+        { iData.size_bytes = param["size"].toInt(); }
+
+
+        if (iData.size_bytes >= UART_DATA_MAX_BYTES - 1)
+        {
+            msg = QString("%1: %2")
+                    .arg("UART data did not send: ",
+                         QString("required structure size %1 too big for UART transmission (MAX: %2). See test_case file: %3")
+                         .arg(QString(iData.size_bytes), QString(UART_DATA_MAX_BYTES),
+                              test_case_path));
+            msgItog.append(msg);
+
+            qDebug(logCritical()) << msg << Qt::endl;
+            Logger::writeToConsol(QString("\nERROR: %1\n").arg(msg));
+            return;
+        }
+        else
+        {
+            formCmdDataInBuffer();
+            QByteArray data;
+
+            if (param["cmd_from_binary_file"].toBool() == true)
+            {
+                QString binaryFile = cfg["binary"].toString();
+                QFile cmdFile(binaryFile);
+                if (!cmdFile.open(QIODevice::ReadOnly))
+                {
+                    msg = QString("%1, path: %2").arg("command binary not found", binaryFile);
+                    msgItog.append(msg);
+
+                    qDebug(logCritical()) << msg << Qt::endl;
+                    Logger::writeToConsol(QString("\nERROR: %1\n").arg(msg));
+                }
+
+                data = cmdFile.readAll();
+            }
+            else
+            {
+                QByteArray data1(QByteArray::fromRawData(cmdDataBuf, UART_DATA_MAX_BYTES));
+                data = data1;
+            }
+
+            if (!uart.send(data, err))
+            {
+                msg = QString("%1: %2").arg("UART data did not send", err);
+                msgItog.append(msg);
+
+                qDebug(logCritical()) << msg << Qt::endl;
+                Logger::writeToConsol(QString("\nERROR: %1\n").arg(msg));
+            }
+
+
+        }
+
+        QByteArray rx_data = uart.receive(cfg["timeout_msec"].toInt());
+
+        Snapshot_HK_t snapshot;
+        memcpy(&snapshot, rx_data.constData(), sizeof(snapshot));
+
+        EXPECT_EQ(snapshot.version, 1);
+        EXPECT_EQ(snapshot.size, 222);
+        EXPECT_EQ(snapshot.system_error, 0);
+        EXPECT_EQ(snapshot.guard.all, 0);
+
+        EXPECT_EQ(snapshot.uart.errorLastOperation, 0);
+
+        QVector<int> excludedIdx;
+        excludedIdx.push_back(0);
+
+        for (int i = 0; i < 20; i++)
+        {
+            bool excludeFlag = false;
+
+            for (int j = 0; j < excludedIdx.size(); j++)
+            {
+                if (i == excludedIdx[j])
+                { excludeFlag = true; break; }
+
+            }
+
+            if (excludeFlag == false)
+            { EXPECT_EQ(snapshot.uart.error[i], 0); }
+        }
+
+        passed = true;
     }
-//    ASSERT_TRUE(uart.send(tx_cmd, err));
+    else if (meta["input_data_type"].toString() == "text")
+    {
+        QString binaryFile = cfg["binary"].toString();
+        QFile cmdFile(binaryFile);
+        if (!cmdFile.open(QIODevice::ReadOnly))
+        {
+            msg = QString("%1, path: %2").arg("command binary not found", binaryFile);
+            msgItog.append(msg);
 
-    QByteArray rx_data = uart.receive(cfg["timeout_msec"].toInt());
+            qDebug(logCritical()) << msg << Qt::endl;
+            Logger::writeToConsol(QString("\nERROR: %1\n").arg(msg));
+        }
 
-    ProtocolHandler handler(cfg["expectations"].toObject());
-    handler.feed(rx_data);
+        QByteArray tx_cmd = cmdFile.readAll();
+        if (!uart.send(tx_cmd, err))
+        {
+            msg = QString("%1: %2").arg("UART data did not send", err);
+            msgItog.append(msg);
 
-    QString protocolMsg;
-    bool passed = handler.isDone(protocolMsg);
+            qDebug(logCritical()) << msg << Qt::endl;
+            Logger::writeToConsol(QString("\nERROR: %1\n").arg(msg));
+        }
 
-    if (!passed)
-    { error = QString("Protocol validation failed:\n%1").arg(protocolMsg); }
+        QByteArray rx_data = uart.receive(cfg["timeout_msec"].toInt());
 
-    Logger::saveTestLog(logFile, handler, cfg, passed, error);
+        ProtocolHandler handler(cfg["expectations"].toObject());
+        handler.feed(rx_data);
+
+        if (!passed)
+        { error = QString("Protocol validation failed:\n%1").arg(protocolMsg); }
+
+        passed = handler.isDone(protocolMsg);
+        Logger::saveTestLog(logFile, handler, cfg, passed, error);
+    }
+
 
     stats.total++;
     if (passed) stats.passed++;
@@ -266,39 +388,89 @@ void UARTFixture::runCase(
     { QThread::msleep(g_options.delayMs); }
 }
 
+void UARTFixture::serializeCmdDataBuf(void *dataStruct, int countBytes)
+{
+    UART_cmdWord_u cmdWord;
+
+    cmdWord.all = 0;
+    cmdWord.bit.cmdCode = UART_cmdReadMemory;
+    cmdWord.bit.countBytes = countBytes;
+
+    int cntBytesAll = CMD_WORD_SIZE + cmdWord.bit.countBytes;
+
+    memcpy(cmdDataBuf, &cmdWord.all, CMD_WORD_SIZE);
+    memcpy(cmdDataBuf + CMD_WORD_SIZE, dataStruct,
+           cmdWord.bit.countBytes - 1);
+
+    quint8 crc = crc8(cmdDataBuf, cntBytesAll - 1);
+    cmdDataBuf[cntBytesAll - 1] = crc;
+}
+
+
+void UARTFixture::formCmdDataInBuffer()
+{
+    int countBytesCmdData = sizeof(UART_cmdReadMemory_t) + 1;
+    serializeCmdDataBuf(&iData, countBytesCmdData);
+}
 
 void UARTFixture::TearDown()
 {
-//    QString cleanupCase =
-//        "configs/test_cases/test_abort.json";
-
-//    QFile f(cleanupCase);
-
-//    if (!f.open(QIODevice::ReadOnly))
-//        return;
-
-//    QJsonObject cfg =
-//        QJsonDocument::fromJson(
-//            f.readAll()
-//        ).object();
-
-//    QString binary =
-//        cfg["binary"].toString();
-
-//    QFile cmd(binary);
-
-//    if (!cmd.open(QIODevice::ReadOnly))
-//        return;
-
-//    QByteArray tx = cmd.readAll();
-
+//    QThread::msleep(200);
+//    QString msgItog;
+//    QString msg;
 //    QString err;
+//    QString test_case_path = "";
 
-//    uart.send(tx, err);
+//    iData.version = 0x1;
+//    iData.addr_begin = 0x08125600;
+//    iData.size_bytes = 222;
 
-//    uart.receive(
-//        cfg["timeout_msec"].toInt()
-//    );
+//    if (iData.size_bytes >= UART_DATA_MAX_BYTES - 1)
+//    {
+//        msg = QString("%1: %2")
+//                .arg("UART data did not send: ",
+//                     QString("required structure size %1 too big for UART transmission (MAX: %2). See test_case file: %3")
+//                     .arg(QString(iData.size_bytes), QString(UART_DATA_MAX_BYTES),
+//                          test_case_path));
+//        msgItog.append(msg);
+
+//        qDebug(logCritical()) << msg << Qt::endl;
+//        Logger::writeToConsol(QString("\nERROR: %1\n").arg(msg));
+//        return;
+//    }
+//    else
+//    {
+//        formCmdDataInBuffer();
+
+//        QByteArray data(QByteArray::fromRawData(cmdDataBuf, UART_DATA_MAX_BYTES));
+
+
+//        QString pathData = "data.bin";
+//        QFile file(pathData);
+
+//        if (!file.open(QIODevice::WriteOnly))
+//        { printf("\t\n ERROR open file!"); }
+//        else
+//        {
+//            QDataStream out(&file);
+//            out.writeRawData(data, UART_DATA_MAX_BYTES);
+//            file.close();
+//        }
+
+//        uart.send(data, err);
+
+//        if (!uart.send(data, err))
+//        {
+//            msg = QString("%1: %2").arg("UART data did not send", err);
+//            msgItog.append(msg);
+
+//            qDebug(logCritical()) << msg << Qt::endl;
+//            Logger::writeToConsol(QString("\nERROR: %1\n").arg(msg));
+//        }
+////        QByteArray rx_data = uart.receive(cfg["timeout_msec"].toInt());
+//        QByteArray rx_data = uart.receive(1000);
+//        printf(rx_data);
+//    }
 
 //    QThread::msleep(200);
 }

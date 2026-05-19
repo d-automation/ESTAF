@@ -2,6 +2,7 @@
   "meta": {
     "name": "get_savedBadBlockMap_fromNAND",
     "description": "get bad block map from NAND Flash into RAM",
+    "input_data_type": "text",
     "parameters": {
       "cmd_code": 4,
       "badBlockMapOperMode": 2

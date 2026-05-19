@@ -2,6 +2,7 @@
   "meta": {
     "name": "set_micron_MT29F16G08AJADAWP",
     "description": "check settings for micron_MT29F16G08AJADAWP",
+    "input_data_type": "text",
     "parameters": {
       "cmd_code": 5,
       "endurance": 100000,
