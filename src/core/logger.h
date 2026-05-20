@@ -17,6 +17,10 @@ public:
             bool passed,
             const QString& error = "");
 
+
+    static void saveTestLog(const QString& filename, const QJsonObject& cfg,
+                            bool passed, QString &error, QString mismatches);
+
     static void appendSummary(
             const QString& filename,
             int total,

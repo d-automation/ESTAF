@@ -16,6 +16,43 @@ void Logger::write(const QString& file, const QString& text)
     f.close();
 }
 
+void Logger::saveTestLog(const QString& filename, const QJsonObject& cfg,
+                         bool passed, QString& error, QString mismatches)
+{
+    QString log;
+
+    log += "\n<<<TEST_START>>>\n";
+
+    log += "TEST: ";
+    log += cfg["meta"].toObject()["name"].toString();
+    log += "\n";
+
+    log += "TIME: ";
+    log += QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss");
+    log += "\n";
+
+    log += passed ? "STATUS: PASS\n" : "STATUS: FAIL\n";
+
+    if (!error.isEmpty())
+    {
+        log += "\n--- ERROR ---\n";
+        log += error;
+        log += "\n";
+    }
+
+    if (!mismatches.isEmpty())
+    {
+        log += "\n--- MISMATCHES ---\n";
+        log += mismatches;
+        log += "\n";
+    }
+
+    log += "<<<TEST_END>>>\n";
+
+    write(filename, log);
+}
+
+
 void Logger::saveTestLog(
         const QString& filename,
         const ProtocolHandler& handler,

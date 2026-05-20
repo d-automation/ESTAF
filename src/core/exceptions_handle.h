@@ -30,27 +30,6 @@ private:
     QString filePath;
 };
 
-
-//class ErrOpenFile: public exception
-//{
-//public:
-//    ErrOpenFile(QString fname, QString errMsg)
-//    {
-//        this->fname = fname;
-//        this->intro = "ошибка чтения файла";
-//        this->errMsg = errMsg;
-//    }
-//    QString getFname() { return fname; }
-//    QString getIntro() { return intro; }
-//    QString getErrMsg() { return errMsg; }
-//    virtual ~ErrOpenFile() throw() {}
-
-//private:
-//    QString fname;
-//    QString intro;
-//    QString errMsg;
-//};
-
 class ErrInJsonSet: public exception
 {
 public:
@@ -59,7 +38,7 @@ public:
         this->fname = fname;
         this->jsonObjectsList = jsonObjectsList;
         this->param = param;
-        this->intro = "ошибка чтения файла настроек";
+        this->intro = "error reading json file";
         this->errMsg = errMsg;
         this->errFromJsonFlag = false;
     }
@@ -67,7 +46,7 @@ public:
     {
         this->fname = fname;
         this->errFromJsonFlag = true;
-        this->intro = "ошибка чтения файла настроек";
+        this->intro = "error reading json file";
         this->errFromJson = errFromJson;
     }
     QString getFname() { return fname; }

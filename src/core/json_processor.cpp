@@ -21,7 +21,7 @@ void JsonProcessor::openJsonFile(QString jsonPath, QJsonObject &jsonObj)
         file.close();
     }
     else
-    { throw(ErrOpenFile(jsonPath, "файл не найден")); }
+    { throw(ErrOpenFile(jsonPath, "file not found")); }
 
     QJsonParseError jsonError;
     QJsonDocument doc = QJsonDocument::fromJson(bytes, &jsonError);
@@ -32,7 +32,7 @@ void JsonProcessor::openJsonFile(QString jsonPath, QJsonObject &jsonObj)
         if (doc.isObject())
         { jsonObj = doc.object(); }
         else
-        { throw(ErrInJsonSet(jsonPath, "неверный формат json: " + jsonPath)); }
+        { throw(ErrInJsonSet(jsonPath, "incorrect json format: " + jsonPath)); }
     }
 }
 
@@ -50,7 +50,7 @@ void JsonProcessor::saveJsonDataInFile(QString jsonPath, QJsonObject jsonObj)
         file.close();
     }
     else
-    { throw(ErrOpenFile(jsonPath, "файл не найден")); }
+    { throw(ErrOpenFile(jsonPath, "file not found")); }
 }
 
 /* common functions */
@@ -61,7 +61,11 @@ void JsonProcessor::jsonConvertStruct(QString jsonObjName, QJsonObject obj,
     QJsonArray *param = new QJsonArray;
     *param = obj[jsonParamName].toArray();
     if (param->size() != arrSize)
-    { throw(ErrInJsonSet(jsonPath, jsonObjName, jsonParamName, "параметр отсутствует или кол-во элементов в параметре должно быть равно " + QString::number(arrSize))); }
+    {
+        throw(ErrInJsonSet(jsonPath, jsonObjName, jsonParamName,
+                         "parameter is missing or elements count in parameter must be equal " +
+                           QString::number(arrSize)));
+    }
     else
     {
         for (int i = 0; i < arrSize; i++)
@@ -95,7 +99,7 @@ void JsonProcessor::jsonConvertStruct(QString jsonObjName, QJsonObject obj,
     QJsonArray param = obj[jsonParamName].toArray();
     if (param.size() != arrSize)
     { throw(ErrInJsonSet(jsonPath, jsonObjName, jsonParamName,
-                         "параметр отсутствует или кол-во элементов в параметре должно быть равно " + QString::number(arrSize))); }
+                         "parameter is missing or elements count in parameter must be equal " + QString::number(arrSize))); }
     else
     {
         for (int i = 0; i < arrSize; i++)
@@ -109,7 +113,7 @@ void JsonProcessor::jsonConvertStruct(QString jsonObjName, QJsonObject obj,
     QJsonArray param = obj[jsonParamName].toArray();
     if (param.size() != arrSize)
     { throw(ErrInJsonSet(jsonPath, jsonObjName, jsonParamName,
-                         "параметр отсутствует или кол-во элементов в параметре должно быть равно " + QString::number(arrSize))); }
+                         "parameter is missing or elements count in parameter must be equal " + QString::number(arrSize))); }
     else
     {
         for (int i = 0; i < arrSize; i++)
@@ -121,7 +125,7 @@ bool JsonProcessor::jsonGetBoolValue(QJsonObject obj, QString param, QString jso
 {
     QJsonValue val = obj[param];
     if (val == QJsonValue::Null)
-    { throw(ErrInJsonSet(jsonPath, jsonGeneral, param, "отсутствует параметр")); }
+    { throw(ErrInJsonSet(jsonPath, jsonGeneral, param, "parameter is missing")); }
     return val.toBool(false);
 }
 
@@ -129,7 +133,7 @@ void JsonProcessor::jsonGetStrValue(QJsonObject obj, QString paramName, QString 
 {
     QString val = obj[paramName].toString();
     if (val == NULL)
-    { throw(ErrInJsonSet(jsonPath, jsonObjName, paramName, "parameter missing")); }
+    { throw(ErrInJsonSet(jsonPath, jsonObjName, paramName, "parameter is missing")); }
     else
     { paramValue = val; }
 }
@@ -140,34 +144,34 @@ void JsonProcessor::jsonSetComPortSettings(QString jsonObjName, QJsonObject obj,
     com.addrRS485 = obj["RS485_address"].toInt();
     if (com.addrRS485 < 1 ||
             com.addrRS485 > 254)
-    { throw(ErrInJsonSet(jsonPath, jsonObjName, "RS485_address", "отсутствует параметр")); }
+    { throw(ErrInJsonSet(jsonPath, jsonObjName, "RS485_address", "paremeter is missing")); }
 
     com.name = obj["COM_port"].toString();
-    if (com.name == NULL) { throw(ErrInJsonSet(jsonPath, jsonObjName, "COM_port", "отсутствует параметр")); }
+    if (com.name == NULL) { throw(ErrInJsonSet(jsonPath, jsonObjName, "COM_port", "paremeter is missing")); }
 
     com.baudRate = (quint32)obj["COM_baudRate"].toInt();
-    if (com.baudRate == 0) { throw(ErrInJsonSet(jsonPath, jsonObjName, "COM_baudRate", "отсутствует параметр")); }
+    if (com.baudRate == 0) { throw(ErrInJsonSet(jsonPath, jsonObjName, "COM_baudRate", "paremeter is missing")); }
 
     com.dataBits = (QSerialPort::DataBits)obj["COM_bits"].toInt();
     if (com.dataBits < QSerialPort::Data5 ||
             com.dataBits > QSerialPort::Data8)
-    { throw(ErrInJsonSet(jsonPath, jsonObjName, "COM_bits", "отсутствует параметр")); }
+    { throw(ErrInJsonSet(jsonPath, jsonObjName, "COM_bits", "paremeter is missing")); }
 
     com.parity = (QSerialPort::Parity)obj["COM_parity"].toInt();
     if (com.parity < QSerialPort::UnknownParity ||
             com.parity == 1 ||
             com.parity > QSerialPort::MarkParity)
-    { throw(ErrInJsonSet(jsonPath, jsonObjName, "COM_parity", "отсутствует параметр")); }
+    { throw(ErrInJsonSet(jsonPath, jsonObjName, "COM_parity", "paremeter is missing")); }
 
     com.stopBits = (QSerialPort::StopBits)obj["COM_stopBits"].toInt();
     if (com.stopBits < QSerialPort::OneStop ||
             com.stopBits > QSerialPort::OneAndHalfStop)
-    { throw(ErrInJsonSet(jsonPath, jsonObjName, "COM_stopBits", "отсутствует параметр")); }
+    { throw(ErrInJsonSet(jsonPath, jsonObjName, "COM_stopBits", "paremeter is missing")); }
 
     com.flowControl = (QSerialPort::FlowControl)obj["COM_flowCotrol"].toInt();
     if (com.flowControl < QSerialPort::NoFlowControl ||
             com.flowControl > QSerialPort::SoftwareControl)
-    { throw(ErrInJsonSet(jsonPath, jsonObjName, "COM_flowControl", "отсутствует параметр")); }
+    { throw(ErrInJsonSet(jsonPath, jsonObjName, "COM_flowControl", "paremeter is missing")); }
 }
 
 void JsonProcessor::jsonSaveComPortSettings(QJsonObject &obj, comSettings_t &com)

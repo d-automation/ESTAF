@@ -2,20 +2,30 @@
   "groups": {
     "smoke": [
       "test_UART_cmdSetDataInterface.json",
+      "test_readSnapshot_HK.json",
       "test_set_micron_MT29F16G08AJADAWP.json",
-      "test_get_badBlockMap_fromNAND.json"
+      "test_readSnapshot_HK.json",
+      "test_get_badBlockMap_fromNAND.json",
+      "test_readSnapshot_HK.json"
     ],
 
     "full": [
       "test_UART_cmdSetDataInterface.json",
+      "test_readSnapshot_HK.json",
       "test_set_micron_MT29F16G08AJADAWP.json",
+      "test_readSnapshot_HK.json",
       "test_get_badBlockMap_fromNAND.json",
+      "test_readSnapshot_HK.json",
       "test_start_March_FTE_by_blocks.json",
+      "test_readSnapshot_HK.json",
       "test_randomDataTest_100_110.json",
+      "test_readSnapshot_HK.json",
       "test_endurance_50_60_marchFTE_5.json",
       "test_abort.json",
+      "test_readSnapshot_HK.json",
       "test_start_March_FTE_all_targ0_repeat2.json",
-      "test_abort.json"
+      "test_abort.json",
+      "test_readSnapshot_HK.json"
     ],
 
     "abort": [

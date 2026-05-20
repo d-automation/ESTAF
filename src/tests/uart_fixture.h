@@ -80,6 +80,7 @@ protected:
     static QString logFile;
     static UART_cmdReadMemory_t iData;
     static char cmdDataBuf[UART_DATA_MAX_BYTES];
+    static QVector<QString> struct_names;
 
     static void serializeCmdDataBuf(void *dataStruct, int countBytes);
     static void formCmdDataInBuffer();
@@ -88,12 +89,37 @@ protected:
 
     static int readConfig();
     static int convert_map_file();
-    static int extract_struct_from_elf(QString structTypeName);
 
     void TearDown() override;
     void runCase(const QString& caseFile);
+    void updateStats(bool passed);
+    bool sendCommand(const QByteArray &data);
+    QByteArray receiveResponse(const QJsonObject &cfg);
 
-    static void writeToLog(QString errMsg, bool passed);
+    bool loadBinaryFile(const QString& fileName, QByteArray& data);
+
+    bool validateTextResponse(const QByteArray& rx,
+                              const QJsonObject& cfg, QString caseFile);
+    bool runTextCase(const QJsonObject& cfg, QString caseFile);
+
+    bool prepareBinaryCommand(const QJsonObject& cfg, QByteArray& data);
+
+    bool validateStructField(const QByteArray& rxData,
+                             const QJsonObject& fieldCfg,
+                             const QJsonObject& structJson,
+                             QString& errMsg,
+                             QString &errMsgMismatch, QString caseFile);
+    bool validateBinaryResponse(const QByteArray& rx, const QJsonObject& cfg,
+                                const QJsonObject &structJson, QString caseFile);
+    bool runBinaryCase(const QJsonObject& cfg, const QJsonObject &meta,
+                       QString caseFile);
+
+    bool loadTestCase(const QString& caseFile,
+                      QJsonObject& cfg,
+                      QJsonObject& meta);
+
+    static void writeToLog(const QString &errMsg, bool passed);
+    static int extract_struct_from_elf(QString structTypeName);
 
 private:
 };
