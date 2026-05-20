@@ -30,6 +30,8 @@ public:
     virtual void jsonSaveComPortSettings(QJsonObject &obj, comSettings_t &com);
 
     virtual void jsonGetStrValue(QJsonObject obj, QString paramName, QString &paramValue, QString jsonObjName);
+    virtual int jsonGetIntValue(QJsonObject obj, QString paramName, QString jsonObjName);
+    virtual double jsonGetDoubleValue(QJsonObject obj, QString paramName, QString jsonObjName);
 
 
 private:

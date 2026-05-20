@@ -138,6 +138,22 @@ void JsonProcessor::jsonGetStrValue(QJsonObject obj, QString paramName, QString 
     { paramValue = val; }
 }
 
+int JsonProcessor::jsonGetIntValue(QJsonObject obj, QString paramName, QString jsonObjName)
+{
+    QJsonValue val = obj[paramName];
+    if (val == QJsonValue::Null)
+    { throw(ErrInJsonSet(jsonPath, jsonObjName, paramName, "parameter is missing")); }
+    return val.toInt();
+}
+
+double JsonProcessor::jsonGetDoubleValue(QJsonObject obj, QString paramName, QString jsonObjName)
+{
+    QJsonValue val = obj[paramName];
+    if (val == QJsonValue::Null)
+    { throw(ErrInJsonSet(jsonPath, jsonObjName, paramName, "parameter is missing")); }
+    return val.toDouble();
+}
+
 
 void JsonProcessor::jsonSetComPortSettings(QString jsonObjName, QJsonObject obj, comSettings_t &com)
 {

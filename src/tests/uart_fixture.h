@@ -100,17 +100,17 @@ protected:
 
     bool validateTextResponse(const QByteArray& rx,
                               const QJsonObject& cfg, QString caseFile);
-    bool runTextCase(const QJsonObject& cfg, QString caseFile);
-
+    bool runTextCase(const QJsonObject& cfg, QString caseFile, QString jsonObjName);
     bool prepareBinaryCommand(const QJsonObject& cfg, QByteArray& data);
 
     bool validateStructField(const QByteArray& rxData,
                              const QJsonObject& fieldCfg,
-                             const QJsonObject& structJson,
+                             const QJsonObject& structJson, QString &structJsonFname,
                              QString& errMsg,
-                             QString &errMsgMismatch, QString caseFile);
+                             QString &errMsgMismatch, QString caseFile, QString jsonObjName);
     bool validateBinaryResponse(const QByteArray& rx, const QJsonObject& cfg,
-                                const QJsonObject &structJson, QString caseFile);
+                                const QJsonObject &structJson, QString &structJsonFname,
+                                QString caseFile);
     bool runBinaryCase(const QJsonObject& cfg, const QJsonObject &meta,
                        QString caseFile);
 

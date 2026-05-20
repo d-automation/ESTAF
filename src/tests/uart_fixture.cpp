@@ -237,16 +237,13 @@ bool UARTFixture::validateTextResponse(const QByteArray& rx,
     return passed;
 }
 
-bool UARTFixture::runTextCase(const QJsonObject& cfg, QString caseFile)
+bool UARTFixture::runTextCase(const QJsonObject& cfg, QString caseFile, QString jsonObjName)
 {
     QByteArray tx;
-    QString binaryFname = cfg["binary"].toString();
-
-    if (binaryFname.isEmpty())
-    {
-        writeToLog(QString("'binary' field not found in %1").arg(caseFile), false);
-        return false;
-    }
+    QString binaryFname;
+    JsonProcessor json;
+    json.setJsonFile(caseFile);
+    json.jsonGetStrValue(cfg, "binary", binaryFname, jsonObjName);
 
     if (!loadBinaryFile(binaryFname, tx)) { return false; }
     if (!sendCommand(tx)) { return false; }
@@ -294,35 +291,26 @@ bool UARTFixture::prepareBinaryCommand(const QJsonObject& cfg, QByteArray& data)
 bool UARTFixture::validateStructField(const QByteArray& rxData,
                                       const QJsonObject& fieldCfg,
                                       const QJsonObject& structJson,
+                                      QString& structJsonFname,
                                       QString& errMsg,
                                       QString& errMsgMismatch,
-                                      QString caseFile)
+                                      QString caseFile,
+                                      QString jsonObjName)
 {
     bool found = false;
     QJsonObject fieldInfo;
     QString fieldName, fieldType, op;
     bool isArray = false;
     QJsonArray fields;
+    JsonProcessor json;
+    json.setJsonFile(caseFile);
 
-    fieldName = fieldCfg["field"].toString();
-    if (fieldName.isEmpty())
-    {
-        writeToLog(QString("'field' field not found or incorrect in %1").arg(caseFile), false);
-        return false;
-    }
-    fieldType = fieldCfg["type"].toString();
-    if (fieldType.isEmpty())
-    {
-        writeToLog(QString("'type' field not found or incorrect in %1").arg(caseFile), false);
-        return false;
-    }
-    op        = fieldCfg["op"].toString("==");
-    if (op.isEmpty())
-    {
-        writeToLog(QString("'op' field not found or incorrect in %1").arg(caseFile), false);
-        return false;
-    }
+    json.jsonGetStrValue(fieldCfg, "field", fieldName, jsonObjName);
+    json.jsonGetStrValue(fieldCfg, "type", fieldType, jsonObjName);
+    json.jsonGetStrValue(fieldCfg, "op", op, jsonObjName);
+    double expectValue = json.jsonGetDoubleValue(fieldCfg, "expect", jsonObjName);
 
+    // !!! array field is not necessary so not nececarry using JsonProcessor
     isArray = fieldCfg["array"].toBool(false);
     fields = structJson["fields"].toArray();
 
@@ -345,8 +333,10 @@ bool UARTFixture::validateStructField(const QByteArray& rxData,
     }
 
     // offset and size from ELF JSON
-    int offset = fieldInfo["offset"].toInt();
-    int size   = fieldInfo["size"].toInt();
+    json.setJsonFile(structJsonFname);
+    int offset = json.jsonGetIntValue(fieldInfo, "offset", "");
+    int size = json.jsonGetIntValue(fieldInfo, "size", "");
+    json.setJsonFile(caseFile);
 
     if ((offset + size) > rxData.size())
     {
@@ -379,9 +369,6 @@ bool UARTFixture::validateStructField(const QByteArray& rxData,
         }
 
         int arrayCount = size / elemSize;
-
-        // expected value
-        double expectValue = fieldCfg["expect"].toDouble();
 
         // iterate array
         for (int i = 0; i < arrayCount; i++)
@@ -447,8 +434,6 @@ bool UARTFixture::validateStructField(const QByteArray& rxData,
         return false;
     }
 
-    double expectValue = fieldCfg["expect"].toDouble();
-
     bool ok = false;
     if (op == "==") { ok = (actual == expectValue); }
     else if (op == "!=") { ok = (actual != expectValue); }
@@ -467,9 +452,11 @@ bool UARTFixture::validateStructField(const QByteArray& rxData,
 }
 
 bool UARTFixture::validateBinaryResponse(const QByteArray& rx, const QJsonObject& cfg,
-                                         const QJsonObject& structJson, QString caseFile)
+                                         const QJsonObject& structJson, QString &structJsonFname,
+                                         QString caseFile)
 {
-    QJsonArray checks = cfg["struct_check"].toArray();
+    QString json_checks_field = "struct_check";
+    QJsonArray checks = cfg[json_checks_field].toArray();
     QString err, errMsgMismatch;
     bool passed;
 
@@ -481,8 +468,9 @@ bool UARTFixture::validateBinaryResponse(const QByteArray& rx, const QJsonObject
 
     for (const QJsonValue& v: qAsConst(checks))
     {
-        passed = validateStructField(rx, v.toObject(), structJson,
-                                     err, errMsgMismatch, caseFile);
+        passed = validateStructField(rx, v.toObject(), structJson, structJsonFname,
+                                     err, errMsgMismatch, caseFile,
+                                     json_checks_field);
         if (!passed) { writeToLog(QString("%1\n%2").arg(err, errMsgMismatch) , false); break; }
     }
 
@@ -496,26 +484,21 @@ bool UARTFixture::runBinaryCase(const QJsonObject& cfg, const QJsonObject& meta,
     QByteArray tx;
     QString struct_name, struct_type, structJsonFileName;
     QJsonObject param, structJson;
+    JsonProcessor json;
+    json.setJsonFile(caseFile);
 
     // find struct_name from test_case
-    param = meta["parameters"].toObject();
+    QString parameters = "parameters";
+    param = meta[parameters].toObject();
     if (param.isEmpty())
     {
         writeToLog(QString("'parameters' field not found in %1").arg(caseFile), false);
         return false;
     }
-    struct_name = param["struct_name"].toString();
-    if (struct_name.isEmpty())
-    {
-        writeToLog(QString("'struct_name' field incorrect or not found in %1").arg(caseFile), false);
-        return false;
-    }
-    struct_type = param["struct_type"].toString();
-    if (struct_type.isEmpty())
-    {
-        writeToLog(QString("'struct_type' field incorrect or not found in %1").arg(caseFile), false);
-        return false;
-    }
+
+    json.jsonGetStrValue(param, "struct_name", struct_name, parameters);
+    json.jsonGetStrValue(param, "struct_type", struct_type, parameters);
+
     structJsonFileName = QString("%1%2.json").arg(path.iar_json_out, struct_type);
 
     // extract from elf about struct info
@@ -541,35 +524,48 @@ bool UARTFixture::runBinaryCase(const QJsonObject& cfg, const QJsonObject& meta,
     if (!sendCommand(tx)) { return false; }
 
     QByteArray rx = receiveResponse(cfg);
-    return validateBinaryResponse(rx, cfg, structJson, caseFile);
+    return validateBinaryResponse(rx, cfg, structJson, structJsonFileName, caseFile);
 }
 
 void UARTFixture::runCase(const QString& caseFile)
 {
     QJsonObject cfg, meta;
     bool passed = false;
+    QString rx_data_type;
+    JsonProcessor json;
+    json.setJsonFile(caseFile);
 
     if (!loadTestCase(caseFile, cfg, meta)) { return; }
 
-    QString rx_data_type = meta["input_data_type"].toString();
-
-    if (rx_data_type == "text")
-    { passed = runTextCase(cfg, caseFile); }
-    else if (rx_data_type == "binary")
-    { passed = runBinaryCase(cfg, meta, caseFile); }
-    else
+    try
     {
-        writeToLog(QString("unknown input_data_type (%1) in file: %2")
-                   .arg(rx_data_type, caseFile), false);
-        passed = false;
+        json.jsonGetStrValue(meta, "input_data_type", rx_data_type, "meta");
+
+        if (rx_data_type == "text")
+        { passed = runTextCase(cfg, caseFile, "meta"); }
+        else if (rx_data_type == "binary")
+        { passed = runBinaryCase(cfg, meta, caseFile); }
+        else
+        {
+            writeToLog(QString("unknown input_data_type (%1) in file: %2")
+                       .arg(rx_data_type, caseFile), false);
+            passed = false;
+            updateStats(passed);
+            return;
+        }
+
         updateStats(passed);
-        return;
+
+        if (g_options.delayMs > 0)
+        { QThread::msleep(g_options.delayMs); }
     }
-
-    updateStats(passed);
-
-    if (g_options.delayMs > 0)
-    { QThread::msleep(g_options.delayMs); }
+    catch (ErrInJsonSet &jsonSet)
+    {
+        QString msg = QString("%1. %2: \nJSON parameter: %3\nJSON object: %4.\nfile: %5")
+                .arg(jsonSet.getIntro(), jsonSet.getErrMsg(), jsonSet.getParam(),
+                     jsonSet.getJsonObj(), jsonSet.getFname());
+        writeToLog(msg, false);
+    }
 }
 
 void UARTFixture::serializeCmdDataBuf(void *dataStruct, int countBytes)

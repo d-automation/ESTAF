@@ -6,6 +6,9 @@
       "test_set_micron_MT29F16G08AJADAWP.json",
       "test_readSnapshot_HK.json",
       "test_get_badBlockMap_fromNAND.json",
+      "test_readSnapshot_HK.json",
+      "test_erase_all.json",
+      "test_abort.json",
       "test_readSnapshot_HK.json"
     ],
 
