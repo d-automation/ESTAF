@@ -13,6 +13,8 @@ int main(int argc, char** argv)
 {
     QCoreApplication app(argc, argv);
 
+    printf("Embedded test stand v1.2\n");
+
     g_options = CLIParser::parse(argc, argv);
 
     ::testing::InitGoogleTest(&argc, argv);

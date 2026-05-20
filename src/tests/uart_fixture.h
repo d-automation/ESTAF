@@ -81,6 +81,7 @@ protected:
     static UART_cmdReadMemory_t iData;
     static char cmdDataBuf[UART_DATA_MAX_BYTES];
     static QVector<QString> struct_names;
+    static JsonProcessor json;
 
     static void serializeCmdDataBuf(void *dataStruct, int countBytes);
     static void formCmdDataInBuffer();
@@ -101,7 +102,7 @@ protected:
     bool validateTextResponse(const QByteArray& rx,
                               const QJsonObject& cfg, QString caseFile);
     bool runTextCase(const QJsonObject& cfg, QString caseFile, QString jsonObjName);
-    bool prepareBinaryCommand(const QJsonObject& cfg, QByteArray& data);
+    bool prepareBinaryCommand(const QJsonObject& cfg, QByteArray& data, QString &caseFile);
 
     bool validateStructField(const QByteArray& rxData,
                              const QJsonObject& fieldCfg,

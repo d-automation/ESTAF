@@ -37,7 +37,8 @@
 
     "one": [
       "test_UART_cmdSetDataInterface.json",
-      "test_readSnapshot_HK.json"
+      "test_readSnapshot_HK.json",
+      "test_read_NANDctrlOper.json"
     ]
   }
 }

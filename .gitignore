@@ -25,7 +25,10 @@
 /bin*
 /logs*
 /iar_files*
-/python
+/python/iar_parser/.idea
+/python/iar_parser/.venv
+/python/iar_parser/__pycache__
+/python/iar_parser/venv
 /build*
 /configs/test_cases*
 *.Debug
