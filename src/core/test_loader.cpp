@@ -4,13 +4,22 @@ QStringList TestLoader::loadCases(const QString& group,
                                   const QString& caseFilter,
                                   int repeat)
 {
-    QString fname = "C:/Danila/work/embedded_test_stand/configs/test_plan.json";
-    QFile f(fname);
+    JsonProcessor json;
+    QJsonObject jsonObj;
+    QString jsonPath = "Path";
+    path_t path;
+
+    json.openJsonFile("../config.json", jsonObj);
+    QJsonObject objPath = jsonObj.value(jsonPath).toObject();
+    json.jsonGetStrValue(objPath, "test_plan_path", path.test_plan_path, jsonPath);
+    json.jsonGetStrValue(objPath, "test_cases_path", path.test_cases_path, jsonPath);
+
+    QFile f(path.test_plan_path);
     QStringList result;
 
     if (!f.open(QIODevice::ReadOnly))
     {
-        throw(ErrOpenFile("cannot open json file", fname));
+        throw(ErrOpenFile("cannot open json file", path.test_plan_path));
     }
 
     QJsonObject root = QJsonDocument::fromJson(f.readAll()).object();
@@ -19,7 +28,7 @@ QStringList TestLoader::loadCases(const QString& group,
 
     if (arr.count() == 0)
     {
-        throw(ErrOpenFile("invalid format in json file!", fname));
+        throw(ErrOpenFile("invalid format in json file!", path.test_plan_path));
     }
 
 
@@ -39,7 +48,7 @@ QStringList TestLoader::loadCases(const QString& group,
         }
 
         for (int i = 0; i < repeat; ++i)
-        { result << QString("C:/Danila/work/embedded_test_stand/configs/test_cases/%1").arg(name); }
+        { result << QString("%1%2").arg(path.test_cases_path, name); }
 
     }
 

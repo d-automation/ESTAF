@@ -2,8 +2,11 @@
   "meta": {
     "name": "start_March-FTE_all_targ0_repeat2",
     "description": "start March-FTE for all target",
-    "input_data_type": "text",
     "parameters": {
+      "_comment": "protocol_ID = 1 for text format from UART, see protocol_ID_en",
+      "protocol_ID": 1,
+      "version": 1,
+      "cmd_from_binary_file": true,
       "cmd_code": 20,
       "target": 0,
       "repeat": 2

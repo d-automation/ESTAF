@@ -2,8 +2,11 @@
   "meta": {
     "name": "set_micron_MT29F16G08AJADAWP",
     "description": "check settings for micron_MT29F16G08AJADAWP",
-    "input_data_type": "text",
     "parameters": {
+      "_comment": "protocol_ID = 1 for text format from UART, see protocol_ID_en",
+      "protocol_ID": 1,
+      "version": 1,
+      "cmd_from_binary_file": true,
       "cmd_code": 5,
       "endurance": 100000,
       "timerPeriod": 100,

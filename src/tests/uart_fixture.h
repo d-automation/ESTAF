@@ -101,7 +101,8 @@ protected:
 
     bool validateTextResponse(const QByteArray& rx,
                               const QJsonObject& cfg, QString caseFile);
-    bool runTextCase(const QJsonObject& cfg, QString caseFile, QString jsonObjName);
+    bool runCaseText(const QJsonObject& cfg, const QJsonObject &param,
+                     QString caseFile, QString jsonObjName);
     bool prepareBinaryCommand(const QJsonObject& cfg, QByteArray& data, QString &caseFile);
 
     bool validateStructField(const QByteArray& rxData,
@@ -112,7 +113,7 @@ protected:
     bool validateBinaryResponse(const QByteArray& rx, const QJsonObject& cfg,
                                 const QJsonObject &structJson, QString &structJsonFname,
                                 QString caseFile);
-    bool runBinaryCase(const QJsonObject& cfg, const QJsonObject &meta,
+    bool runCaseReadStructureBin(const QJsonObject& cfg, const QJsonObject &param,
                        QString caseFile);
 
     bool loadTestCase(const QString& caseFile,

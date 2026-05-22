@@ -6,9 +6,6 @@
       "test_set_micron_MT29F16G08AJADAWP.json",
       "test_readSnapshot_HK.json",
       "test_get_badBlockMap_fromNAND.json",
-      "test_readSnapshot_HK.json",
-      "test_erase_all.json",
-      "test_abort.json",
       "test_readSnapshot_HK.json"
     ],
 
@@ -19,6 +16,9 @@
       "test_readSnapshot_HK.json",
       "test_get_badBlockMap_fromNAND.json",
       "test_readSnapshot_HK.json",
+      "test_erase_all.json",
+      "test_abort.json",
+      "test_readSnapshot_HK.json",
       "test_start_March_FTE_by_blocks.json",
       "test_readSnapshot_HK.json",
       "test_randomDataTest_100_110.json",
@@ -28,6 +28,9 @@
       "test_readSnapshot_HK.json",
       "test_start_March_FTE_all_targ0_repeat2.json",
       "test_abort.json",
+      "test_readSnapshot_HK.json",
+      "test_start_retention_rand_25_bin.json",
+      "test_abort.json",
       "test_readSnapshot_HK.json"
     ],
 
@@ -35,10 +38,17 @@
       "test_abort.json"
     ],
 
+    "endurance": [
+      "test_endurance_50_60_marchFTE_5_100.json",
+      "test_abort.json"
+    ],
+
     "one": [
-      "test_UART_cmdSetDataInterface.json",
-      "test_readSnapshot_HK.json",
-      "test_read_NANDctrlOper.json"
+      "#test_UART_cmdSetDataInterface.json",
+      "test_start_retention_rand_25_bin.json",
+      "test_abort.json",
+      "#test_readSnapshot_HK.json",
+      "#test_read_NANDctrlOper.json"
     ]
   }
 }

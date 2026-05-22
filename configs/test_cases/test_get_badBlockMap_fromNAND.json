@@ -2,8 +2,11 @@
   "meta": {
     "name": "get_savedBadBlockMap_fromNAND",
     "description": "get bad block map from NAND Flash into RAM",
-    "input_data_type": "text",
     "parameters": {
+      "_comment": "protocol_ID = 1 for text format from UART, see protocol_ID_en",
+      "protocol_ID": 1,
+      "version": 1,
+      "cmd_from_binary_file": true,
       "cmd_code": 4,
       "badBlockMapOperMode": 2
     }

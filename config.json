@@ -11,6 +11,8 @@
     "Path": {
         "MK_elf_file": "C:/Danila/work/sputnik_test/src/sputnik/Debug/c.out",
         "MK_map_file": "C:/Danila/work/sputnik_test/src/sputnik/Debug/sputnik.map",
+        "test_plan_path": "C:/Danila/work/embedded_test_stand/configs/test_plan.json",
+		"test_cases_path": "C:/Danila/work/embedded_test_stand/configs/test_cases/",
         "test_log_path": "C:/Danila/work/embedded_test_stand/logs/",
         "stand_report_html_path": "C:/Danila/work/embedded_test_stand/logs/report.html",
         "map_parser": "C:/Danila/work/embedded_test_stand/python/iar_parser/map_parser.py",

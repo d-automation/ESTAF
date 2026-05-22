@@ -40,6 +40,27 @@ std::vector<TestCaseParam> getJsonTests()
                                   errOpen.getMessage(),errOpen.getFilePath()));
         return result;
     }
+    catch (ErrInJsonSet &jsonSet)
+    {
+        if (jsonSet.checkErrFromJson())
+        {
+            QString msg = QString("%1. %2 : %3. file: %4")
+                    .arg(jsonSet.getIntro(), jsonSet.getErrMsg(),
+                         jsonSet.getErrFromJson(), jsonSet.getFname());
+            qDebug(logCritical()) << msg;
+            Logger::writeToConsol(msg);
+            return result;
+        }
+        else
+        {
+            QString msg = QString("%1. %2: \nJSON parameter: %3\nJSON object: %4.\nfile: %5")
+                    .arg(jsonSet.getIntro(), jsonSet.getErrMsg(), jsonSet.getParam(),
+                         jsonSet.getJsonObj(), jsonSet.getFname());
+            qDebug(logCritical()) << msg;
+            Logger::writeToConsol(msg);
+            return result;
+        }
+    }
 
     for (const QString &path : list)
     {

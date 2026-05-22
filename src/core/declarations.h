@@ -30,6 +30,14 @@
 #include "html_report.h"
 #include "crc8.h"
 
+typedef enum
+{
+    protocol_ID_none = 0,
+    UART_text = 1,
+    UART_bin_readStruct = 2,
+    PROTOCOL_ID_MAX = 255
+} protocol_ID_en;
+
 struct comSet_t {
         int addrRS485;
         QString name;
@@ -56,6 +64,8 @@ typedef comSet_t comSettings_t;
 typedef struct {
     QString MK_elf_file;
     QString MK_map_file;
+    QString test_plan_path;
+    QString test_cases_path;
     QString test_log_path;
     QString stand_report_html_path;
     QString map_parser;

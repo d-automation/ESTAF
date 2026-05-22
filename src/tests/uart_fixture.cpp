@@ -217,27 +217,50 @@ bool UARTFixture::validateTextResponse(const QByteArray& rx,
         passed = false; return passed;
     }
 
-    ProtocolHandler handler(exp);
-
-    handler.feed(rx);
-
-    passed = handler.isDone(protocolMsg);
+    ProtocolHandler handler(exp, caseFile, "expectations");
+    passed = handler.feed(rx, protocolMsg);
 
     if (!passed)
-    { error = QString("Protocol validation failed:\n%1").arg(protocolMsg); }
+    {
+        error = QString("Protocol validation failed: %1, testCase: %2")
+                .arg(protocolMsg, caseFile);
+        writeToLog(error, false);
+    }
+    else
+    {
+        passed = handler.isDone(protocolMsg);
+        if (!passed)
+        {
+            error = QString("Protocol validation failed: %1, testCase: %2")
+                .arg(protocolMsg, caseFile);
+            writeToLog(error, false);
+        }
+    }
 
     Logger::saveTestLog(logFile, handler, cfg, passed, error);
-
     return passed;
 }
 
-bool UARTFixture::runTextCase(const QJsonObject& cfg, QString caseFile, QString jsonObjName)
+bool UARTFixture::runCaseText(const QJsonObject& cfg, const QJsonObject& param,
+                              QString caseFile, QString jsonObjName)
 {
     QByteArray tx;
     QString binaryFname;
     json.jsonGetStrValue(cfg, "binary", binaryFname, jsonObjName);
 
-    if (!loadBinaryFile(binaryFname, tx)) { return false; }
+    bool binaryFile = json.jsonGetBoolValue(param, "cmd_from_binary_file", "parameters");
+    if (binaryFile)
+    {
+        QString binaryPath;
+        json.jsonGetStrValue(cfg, "binary", binaryPath, "");
+        if (!loadBinaryFile(binaryFname, tx)) { return false; }
+    }
+    else
+    {
+        writeToLog(QString("command supports from binary file only: %1").arg(caseFile), false);
+        return false;
+    }
+
     if (!sendCommand(tx)) { return false; }
 
     QByteArray rx = receiveResponse(cfg);
@@ -531,24 +554,15 @@ bool UARTFixture::validateBinaryResponse(const QByteArray& rx, const QJsonObject
     return true;
 }
 
-bool UARTFixture::runBinaryCase(const QJsonObject& cfg, const QJsonObject& meta,
+bool UARTFixture::runCaseReadStructureBin(const QJsonObject& cfg, const QJsonObject& param,
                                 QString caseFile)
 {
     QByteArray tx;
     QString struct_name, struct_type, structJsonFileName;
-    QJsonObject param, structJson;
+    QJsonObject structJson;
 
-    // find struct_name from test_case
-    QString parameters = "parameters";
-    param = meta[parameters].toObject();
-    if (param.isEmpty())
-    {
-        writeToLog(QString("'parameters' field not found in %1").arg(caseFile), false);
-        return false;
-    }
-
-    json.jsonGetStrValue(param, "struct_name", struct_name, parameters);
-    json.jsonGetStrValue(param, "struct_type", struct_type, parameters);
+    json.jsonGetStrValue(param, "struct_name", struct_name, "parameters");
+    json.jsonGetStrValue(param, "struct_type", struct_type, "parameters");
 
     structJsonFileName = QString("%1%2.json").arg(path.iar_json_out, struct_type);
 
@@ -572,25 +586,33 @@ bool UARTFixture::runBinaryCase(const QJsonObject& cfg, const QJsonObject& meta,
 
 void UARTFixture::runCase(const QString& caseFile)
 {
-    QJsonObject cfg, meta;
+    QJsonObject cfg, meta, param;
     json.setJsonFile(caseFile);
 
     try
     {
         if (!loadTestCase(caseFile, cfg, meta)) { return; }
-
         bool passed = false;
-        QString rx_data_type;
-        json.jsonGetStrValue(meta, "input_data_type", rx_data_type, "meta");
 
-        if (rx_data_type == "text")
-        { passed = runTextCase(cfg, caseFile, "meta"); }
-        else if (rx_data_type == "binary")
-        { passed = runBinaryCase(cfg, meta, caseFile); }
+        QString parameters = "parameters";
+        param = meta[parameters].toObject();
+        if (param.isEmpty())
+        {
+            writeToLog(QString("'parameters' field not found in %1").arg(caseFile), false);
+            return;
+        }
+
+        protocol_ID_en protocolID = static_cast<protocol_ID_en>(
+                    json.jsonGetIntValue(param, "protocol_ID", parameters));
+
+        if (protocolID == UART_text)
+        { passed = runCaseText(cfg, param, caseFile, "meta"); }
+        else if (protocolID == UART_bin_readStruct)
+        { passed = runCaseReadStructureBin(cfg, param, caseFile); }
         else
         {
             writeToLog(QString("unknown input_data_type (%1) in file: %2")
-                       .arg(rx_data_type, caseFile), false);
+                       .arg(QString(protocolID), caseFile), false);
             passed = false;
             updateStats(passed);
             return;

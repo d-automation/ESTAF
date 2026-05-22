@@ -2,8 +2,11 @@
   "meta": {
     "name": "start_March-FTE_by_blocks",
     "description": "start March-FTE by specified blocks",
-    "input_data_type": "text",
     "parameters": {
+      "_comment": "protocol_ID = 1 for text format from UART, see protocol_ID_en",
+      "protocol_ID": 1,
+      "version": 1,
+      "cmd_from_binary_file": true,
       "cmd_code": 21,
       "mode_March_FTE": 2,
       "begin_block": 20,
