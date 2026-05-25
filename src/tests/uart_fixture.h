@@ -102,7 +102,7 @@ protected:
     bool validateTextResponse(const QByteArray& rx,
                               const QJsonObject& cfg, QString caseFile);
     bool runCaseText(const QJsonObject& cfg, const QJsonObject &param,
-                     QString caseFile, QString jsonObjName);
+                     QString caseFile);
     bool prepareBinaryCommand(const QJsonObject& cfg, QByteArray& data, QString &caseFile);
 
     bool validateStructField(const QByteArray& rxData,

@@ -20,7 +20,7 @@
     }
   },
 
-  "binary": "C:/Danila/work/embedded_test_stand/cmd/set_settings_NAND_micron_MT29F16G08AJADAWP.bin",
+  "binary": "set_settings_NAND_micron_MT29F16G08AJADAWP.bin",
 
   "expectations": {
     "start": {

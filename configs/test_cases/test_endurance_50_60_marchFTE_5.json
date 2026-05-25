@@ -13,7 +13,7 @@
     }
   },
 
-  "binary": "C:/Danila/work/embedded_test_stand/cmd/endurance_50_60_marchFTE_5.bin",
+  "binary": "endurance_50_60_marchFTE_5.bin",
 
   "expectations": {
     "start": {

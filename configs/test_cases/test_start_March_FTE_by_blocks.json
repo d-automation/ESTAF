@@ -14,7 +14,7 @@
     }
   },
 
-  "binary": "C:/Danila/work/embedded_test_stand/cmd/start_March-FTE_by_blocks_20_25.bin",
+  "binary": "start_March-FTE_by_blocks_20_25.bin",
 
   "expectations": {
     "start": {

@@ -12,7 +12,7 @@
     }
   },
 
-  "binary": "C:/Danila/work/embedded_test_stand/cmd/get_savedBadBlockMap_fromNAND.bin",
+  "binary": "get_savedBadBlockMap_fromNAND.bin",
 
   "expectations": {
     "start": {

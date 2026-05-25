@@ -72,6 +72,7 @@ typedef struct {
     QString elf_parser;
     QString iar_json_out;
     QString local_python;
+    QString cmd_bin_path;
 } path_t;
 
 

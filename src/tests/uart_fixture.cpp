@@ -68,6 +68,7 @@ int UARTFixture::readConfig()
         json.jsonGetStrValue(objPath, "elf_parser", path.elf_parser, jsonPath);
         json.jsonGetStrValue(objPath, "iar_json_out", path.iar_json_out, jsonPath);
         json.jsonGetStrValue(objPath, "local_python", path.local_python, jsonPath);
+        json.jsonGetStrValue(objPath, "cmd_bin_path", path.cmd_bin_path, jsonPath);
     }
         catch (ErrOpenFile &errOpen)
     {
@@ -242,18 +243,16 @@ bool UARTFixture::validateTextResponse(const QByteArray& rx,
 }
 
 bool UARTFixture::runCaseText(const QJsonObject& cfg, const QJsonObject& param,
-                              QString caseFile, QString jsonObjName)
+                              QString caseFile)
 {
     QByteArray tx;
-    QString binaryFname;
-    json.jsonGetStrValue(cfg, "binary", binaryFname, jsonObjName);
 
-    bool binaryFile = json.jsonGetBoolValue(param, "cmd_from_binary_file", "parameters");
-    if (binaryFile)
+    bool getBinaryFile = json.jsonGetBoolValue(param, "cmd_from_binary_file", "parameters");
+    if (getBinaryFile)
     {
-        QString binaryPath;
-        json.jsonGetStrValue(cfg, "binary", binaryPath, "");
-        if (!loadBinaryFile(binaryFname, tx)) { return false; }
+        QString binaryFname;
+        json.jsonGetStrValue(cfg, "binary", binaryFname, "");
+        if (!loadBinaryFile(path.cmd_bin_path + binaryFname, tx)) { return false; }
     }
     else
     {
@@ -606,7 +605,7 @@ void UARTFixture::runCase(const QString& caseFile)
                     json.jsonGetIntValue(param, "protocol_ID", parameters));
 
         if (protocolID == UART_text)
-        { passed = runCaseText(cfg, param, caseFile, "meta"); }
+        { passed = runCaseText(cfg, param, caseFile); }
         else if (protocolID == UART_bin_readStruct)
         { passed = runCaseReadStructureBin(cfg, param, caseFile); }
         else

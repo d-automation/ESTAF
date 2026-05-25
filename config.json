@@ -18,6 +18,7 @@
         "map_parser": "C:/Danila/work/embedded_test_stand/python/iar_parser/map_parser.py",
         "elf_parser": "C:/Danila/work/embedded_test_stand/python/iar_parser/elf_parser.py",
         "iar_json_out": "C:/Danila/work/embedded_test_stand/iar_files/",
-        "local_python": "C:/Danila/work/embedded_test_stand/python/iar_parser/venv/Scripts/python.exe"
+        "local_python": "C:/Danila/work/embedded_test_stand/python/iar_parser/venv/Scripts/python.exe",
+		"cmd_bin_path": "C:/Danila/work/embedded_test_stand/cmd/"
     }
 }

@@ -15,7 +15,7 @@
     }
   },
 
-  "binary": "C:/Danila/work/embedded_test_stand/cmd/randomDataTest_blocks_100_110_seed_1.bin",
+  "binary": "randomDataTest_blocks_100_110_seed_1.bin",
 
   "expectations": {
     "start": {
