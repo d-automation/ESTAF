@@ -1,0 +1,21 @@
+{
+  "name": "BadBlockMapType",
+  "fields": [
+    {
+      "name": "numBadBlock",
+      "offset": 0,
+      "size": 2,
+      "type": "uint16"
+    },
+    {
+      "name": "badList",
+      "offset": 4,
+      "size": 400,
+      "array": true,
+      "count": 100,
+      "elem_size": 4,
+      "elem_type": "uint32"
+    }
+  ],
+  "size": 2
+}

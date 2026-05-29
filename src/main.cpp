@@ -13,7 +13,7 @@ int main(int argc, char** argv)
 {
     QCoreApplication app(argc, argv);
 
-    printf("Embedded test stand. (Version 1.3, 25.05.2026)\n");
+    printf("Embedded test stand. (Version 1.4, 29.05.2026)\n");
 
     g_options = CLIParser::parse(argc, argv);
 

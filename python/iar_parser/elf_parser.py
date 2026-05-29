@@ -308,24 +308,24 @@ if __name__ == "__main__":
     # usage example:
     # python elf_parser.py -f "C:\Danila\work\sputnik_test\src\sputnik\Debug\c.out" -t "Snapshot_HK_t"
 
-    argparser = argparse.ArgumentParser("elf_parser.py")
-
-    argparser.add_argument('-f', '--elf_file', required=True,
-                           help='specify path to elf-file')
-    argparser.add_argument('-t', '--struct_name', required=True,
-                           help='specify structure name (\"UART_t\" for example')
-    argparser.add_argument('-o', '--out_path', required=True,
-                           help='specify out path with map data file in json format (\"C:/data/\" for example)')
-
-    args = argparser.parse_args()
+    # argparser = argparse.ArgumentParser("elf_parser.py")
+    #
+    # argparser.add_argument('-f', '--elf_file', required=True,
+    #                        help='specify path to elf-file')
+    # argparser.add_argument('-t', '--struct_name', required=True,
+    #                        help='specify structure name (\"UART_t\" for example')
+    # argparser.add_argument('-o', '--out_path', required=True,
+    #                        help='specify out path with map data file in json format (\"C:/data/\" for example)')
+    #
+    # args = argparser.parse_args()
 
     try:
-        # elf_file = "C:\Danila\work\sputnik_test\src\sputnik\Debug\c.out"
-        # struct_name = "NANDctrlOper_t"
-        # out_path = "./"
-        # parser = DWARFstructParser(elf_file, struct_name, out_path)
+        elf_file = "C:/Danila/work/1892VM12/boot2/MultiCore_Configuration_Debug/boot2.elf"
+        struct_name = "BuffU8Type"
+        out_path = "./"
+        parser = DWARFstructParser(elf_file, struct_name, out_path)
 
-        parser = DWARFstructParser(args.elf_file, args.struct_name, args.out_path)
+        # parser = DWARFstructParser(args.elf_file, args.struct_name, args.out_path)
         json_struct = parser.get_struct()
         parser.save_struct_to_json(json_struct)
 

@@ -16,7 +16,7 @@ void Logger::write(const QString& file, const QString& text)
     f.close();
 }
 
-void Logger::saveTestLog(const QString& filename, const QJsonObject& cfg,
+void Logger::saveTestLog(const QString& filename, const QByteArray& rx, const QJsonObject& cfg,
                          bool passed, QString& error, QString mismatches)
 {
     QString log;
@@ -46,6 +46,11 @@ void Logger::saveTestLog(const QString& filename, const QJsonObject& cfg,
         log += mismatches;
         log += "\n";
     }
+
+    log += "\n--- FULL LOG ---\n";
+
+    log += QString::fromUtf8(rx.toHex(' '));
+    log += "\n";
 
     log += "<<<TEST_END>>>\n";
 

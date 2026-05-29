@@ -549,7 +549,7 @@ bool UARTFixture::validateBinaryResponse(const QByteArray& rx, const QJsonObject
         if (!passed) { writeToLog(QString("%1\n%2").arg(err, errMsgMismatch) , false); break; }
     }
 
-    Logger::saveTestLog(logFile, cfg, passed, err, errMsgMismatch);
+    Logger::saveTestLog(logFile, rx, cfg, passed, err, errMsgMismatch);
     return true;
 }
 
