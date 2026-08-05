@@ -18,6 +18,7 @@
 *.cout
 *.log
 *.txt
+!LICENSE.txt
 *.debug
 /cmd*
 /bin*
