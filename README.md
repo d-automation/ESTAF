@@ -1,7 +1,7 @@
 
 # Embedded System Test Automation Framework
 
-**Embedded Systems Test Automation Framework** is a console-based C++ application designed for external testing approach (black-box) for embedded systems. The application works as an automated test bench that interacts with the target processor exclusively via the UART interface.
+**Embedded Systems Test Automation Framework (ESTAF)** is a console-based C++ application designed for external testing approach (black-box) for embedded systems. The application works as an automated test bench that interacts with the target processor exclusively via the UART interface.
 
 
 ## Table of Contents
