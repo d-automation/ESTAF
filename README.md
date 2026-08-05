@@ -1,7 +1,8 @@
 
 # Embedded System Test Automation Framework
 
-This is a C++ application designed for testing embedded systems using UART communication. The system allows you to load and execute test cases that interact with the UART interface according to predefined protocols.
+**Embedded Systems Test Automation Framework** is a console-based C++ application designed for external testing approach (black-box) for embedded systems. The application works as an automated test bench that interacts with the target processor exclusively via the UART interface.
+
 
 ## Table of Contents
 
@@ -23,8 +24,6 @@ This is a C++ application designed for testing embedded systems using UART commu
 - [Notes (summary)](#notes)
 
 ## Overview
-
-Embedded Systems Test Automation Framework is a console-based C++ application for automated testing of embedded systems through UART communication.
 
 The framework supports:
 
@@ -136,14 +135,14 @@ The project was developed and tested on Windows 10/11 using the following softwa
 | Component | Version |
 |----------|---------|
 | Qt | 5.15.2 |
-| Qt Creator | 9.x or newer |
+| Qt Creator | 6.x or newer |
 | Compiler | MinGW 8.1.0 (64-bit) |
 | Debugger     | `gdb.exe`            |
 | Build system | qmake                |
 | qmake | Qt 5.15.2 |
 | mingw32-make | MinGW 8.1.0 |
 | Python | 3.9+ |
-| GoogleTest | Latest stable version |
+| GoogleTest | 1.14.0 |
 
 #### Qt Modules
 
@@ -167,7 +166,7 @@ pip install -r requirements.txt
 
 #### GoogleTest
 
-The project uses GoogleTest sources directly:
+The project uses GoogleTest sources directly (see file **gtest_dependency.pri**):
 
 ```text
 GOOGLETEST_DIR=C:\path\to\googletest
@@ -175,36 +174,33 @@ GOOGLETEST_DIR=C:\path\to\googletest
 
 ### Build and Deployment
 
-The project is built using **qmake**.
+The project is built using **qmake** from Qt 5.15.2.
+Follow the setup sequence below.
 
 Generate Makefiles:
 
 ```bash
-qmake embedded_test_stand.pro
+cd ./compiler
+<path_to_Qt>/5.15.2/<MinGW 8.1.0 (64-bit)>/bin/qmake.exe ../src/embedded_test_stand.pro -spec win32-g++ "CONFIG+=qtquickcompiler"
 ```
 
 Build:
 
 ```bash
-mingw32-make -j8
+<path_to_Qt>/Tools/<MinGW 8.1.0 (64-bit)>/bin/mingw32-make -j8
 ```
 
 Clean:
 
 ```bash
-mingw32-make clean -j8
-```
-
-The build directory used during development:
-
-```text
-./compiler
+<path_to_Qt>/Tools/<MinGW 8.1.0 (64-bit)>/bin/mingw32-make clean -j8
 ```
 
 After successful compilation, Qt runtime libraries should be deployed using:
 
-```bash
-windeployqt embedded_test_stand.exe
+```text
+export PATH="<path_to_Qt_5.15.2>/<MinGW 8.1.0 (64-bit)>/bin:$PATH"
+<path_to_Qt_5.15.2>/<MinGW 8.1.0 (64-bit)>bin/windeployqt.exe ./release/embedded_test_stand.exe
 ```
 
 In Qt Creator the following deployment step is used:
@@ -220,15 +216,11 @@ Working directory:
 %{buildDir}/compiler
 ```
 
-This command automatically copies:
+This command automatically copies to the executable directory the following libraries:
 
 * QtCore.dll
 * Qt5SerialPort.dll
-* platform plugins
-* required MinGW runtime libraries
 * other Qt dependencies
-
-to the executable directory.
 
 
 ## Configuration

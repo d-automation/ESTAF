@@ -48,7 +48,6 @@ HEADERS += \
     core/test_options.h \
     core/test_stats.h \
     core/uart.h \
-    core/uart_port.h \
     core/protocol_handler.h \
     tests/uart_fixture.h
 
