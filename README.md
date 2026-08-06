@@ -1,5 +1,5 @@
 
-# Embedded System Test Automation Framework
+# ESTAF: Embedded System Test Automation Framework
 
 **Embedded Systems Test Automation Framework** is a console-based C++ application designed for external testing approach (black-box) for embedded systems. The application works as an automated test bench that interacts with the target processor exclusively via the UART interface.
 
@@ -22,6 +22,7 @@
   - [Processing Binary Data Received via UART](#processing-binary-data-received-via-uart)
 - [Reporting](#reporting)
 - [Notes (summary)](#notes)
+- [License](#license)
 
 ## Overview
 
@@ -77,29 +78,22 @@ The generated metadata are stored as JSON files inside:
 ```text
 ├── cmd
 │   ├── cmd_abort.bin
-│   ├── set_interface_params.bin
-│   ├── set_settings_NAND_micron_MT29F16G08AJADAWP.bin
+│   ├── ...
 ├── compiler
-│   ├── Makefile
-│   ├── Makefile.Debug
-│   ├── Makefile.Release
-│   ├── data.bin
+│   ├── Debug
+│   ├── Release
 ├── config.json
 ├── configs
 │   ├── cmd
 │   ├── test_cases
 │   │   ├── test_UART_cmdSetDataInterface.json
-│   │   ├── test_abort.json
-│   │   ├── test_readSnapshot_HK.json
-│   │   ├── test_read_NANDctrlOper.json
-│   │   ├── test_set_micron_MT29F16G08AJADAWP.json
+│   │   ├── ...
 │   └── test_plan.json
 ├── iar_files
 │   ├── ENTRY_LIST_map.json
 │   ├── NANDctrlOper_t.json
 │   └── Snapshot_HK_t.json
 ├── logs
-│   ├── 12_05_2026_15_48_16.log
 │   ├── report.html
 │   ├── test_cases.log
 │   └── test_stand.log
@@ -112,13 +106,8 @@ The generated metadata are stored as JSON files inside:
 ├── src
 │   ├── core
 │   │   ├── cli_parser.cpp
-│   │   ├── cli_parser.h
 ...
-│   │   ├── uart.cpp
 │   │   └── uart.h
-│   ├── embedded_test_stand.pro
-│   ├── embedded_test_stand.pro.user
-│   ├── gtest_dependency.pri
 │   ├── main.cpp
 │   └── tests
 │       ├── test_runner.cpp
@@ -239,15 +228,15 @@ See `./config.json` file:
     "COM_flowControl": false
   },
   "Path": {
-    "MK_elf_file": "C:/Danila/work/sputnik_test/src/sputnik/Debug/c.out",
-    "MK_map_file": "C:/Danila/work/sputnik_test/src/sputnik/Debug/sputnik.map",
-    "test_plan_path": "C:/Danila/work/embedded_test_stand/configs/test_plan.json",
-    "test_cases_path": "C:/Danila/work/embedded_test_stand/configs/test_cases/",
-    "test_log_path": "C:/Danila/work/embedded_test_stand/logs/",
-    "stand_report_html_path": "C:/Danila/work/embedded_test_stand/logs/report.html",
-    "map_parser": "C:/Danila/work/embedded_test_stand/python/iar_parser/map_parser.py",
-    "elf_parser": "C:/Danila/work/embedded_test_stand/python/iar_parser/elf_parser.py",
-    "binary_cmd_path": "C:/Danila/work/embedded_test_stand/cmd/"
+    "MK_elf_file": "<path_to_elf_file>/fname.out",
+    "MK_map_file": "<path_to_map_compiler_file>/fname.map",
+    "test_plan_path": "<path_to_project>/embedded_test_stand/configs/test_plan.json",
+    "test_cases_path": "<path_to_project>/embedded_test_stand/configs/test_cases/",
+    "test_log_path": "<path_to_project>/embedded_test_stand/logs/",
+    "stand_report_html_path": "<path_to_project>/embedded_test_stand/logs/report.html",
+    "map_parser": "<path_to_project>/embedded_test_stand/python/iar_parser/map_parser.py",
+    "elf_parser": "<path_to_project>/embedded_test_stand/python/iar_parser/elf_parser.py",
+    "binary_cmd_path": "<path_to_project>/embedded_test_stand/cmd/"
   }
 }
 ```
@@ -653,5 +642,7 @@ After that, the complete UART message is assembled and processed.
 - After compilation on Windows, it is recommended to run `windeployqt` to copy all required Qt runtime libraries and plugins to the executable directory.
 
 - The framework can be easily extended with additional UART protocols, new validation rules, custom report generators, and support for other embedded compilers besides IAR.
-
 ---
+
+## License
+This project is licensed under the MIT License 
